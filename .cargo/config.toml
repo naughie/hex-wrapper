@@ -1,0 +1,6 @@
+[alias]
+r = "run"
+b = "build"
+t = "test --workspace --all-features"
+d = "doc --workspace --all-features --no-deps"
+c = "clippy --workspace --all-features"

@@ -1,0 +1,20 @@
+[package]
+name = "hex-wrapper"
+version = "1.0.0"
+edition = "2018"
+authors = ["Masato Nakata <masaton@naughie.com>"]
+description = "Wrappers of the convertion between numbers and hex strings"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/naughie/hex-wrapper"
+documentation = "https://docs.rs/hex-wrapper"
+keywords = ["serde", "serialization", "hex"]
+categories = ["encoding"]
+readme = "README.md"
+include = ["src/", "LICENSE-*", "README.md"]
+
+[features]
+default = []
+
+[dependencies]
+serde = { version = "1.0", optional = true }
+rand = { version = "0.8", optional = true }
