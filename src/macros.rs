@@ -105,6 +105,14 @@ macro_rules! impl_hex {
                 Self::with_rng(rand::thread_rng())
             }
 
+            /// Creates a random hex. This is equivalent to
+            /// [`Self::with_rng(rand::thread_rng())`](`Self::with_rng()`).
+            #[allow(dead_code)]
+            #[cfg(feature = "rand")]
+            pub fn rand() -> Self {
+                Self::with_rng(rand::thread_rng())
+            }
+
             /// Creates a random hex. This is the same as [`Default::default()`].
             #[allow(dead_code)]
             #[cfg(feature = "rand")]
