@@ -7,7 +7,7 @@
 //!
 //! Defaults are all off.
 //!
-//! - `rand`: Enables the random constructor `HexN::new()` and [`Default`] implementation.
+//! - `rand`: Enables random constructors `HexN::rand()` or `HexN::with_rng()`.
 //! - `serde`: Enables conversion used in [`serde`] (e.g. for json).
 //!
 //!

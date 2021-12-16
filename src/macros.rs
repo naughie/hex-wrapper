@@ -9,14 +9,6 @@ pub(crate) mod exports {
 
 macro_rules! impl_traits {
     ($hex: ident) => {
-        #[cfg(feature = "rand")]
-        impl Default for $hex {
-            #[inline]
-            fn default() -> Self {
-                Self::new()
-            }
-        }
-
         impl std::str::FromStr for $hex {
             type Err = std::num::ParseIntError;
 
@@ -97,12 +89,11 @@ macro_rules! impl_hex {
         pub struct $hex($alias);
 
         impl $hex {
-            /// Creates a random hex. This is equivalent to
-            /// [`Self::with_rng(rand::thread_rng())`](`Self::with_rng()`).
+            /// Creates a null hex (i.e., `0`).
             #[allow(dead_code)]
-            #[cfg(feature = "rand")]
+            #[inline]
             pub fn new() -> Self {
-                Self::with_rng(rand::thread_rng())
+                Self(0)
             }
 
             /// Creates a random hex. This is equivalent to
@@ -113,7 +104,7 @@ macro_rules! impl_hex {
                 Self::with_rng(rand::thread_rng())
             }
 
-            /// Creates a random hex. This is the same as [`Default::default()`].
+            /// Creates a random hex.
             #[allow(dead_code)]
             #[cfg(feature = "rand")]
             #[inline]
@@ -141,6 +132,14 @@ macro_rules! impl_hex {
             }
         }
 
+        /// Creates a null hex (i.e., `0`).
+        impl Default for $hex {
+            #[inline]
+            fn default() -> Self {
+                Self(0)
+            }
+        }
+
         impl_traits! { $hex }
     };
 }
@@ -157,11 +156,11 @@ macro_rules! impl_nonzero_hex {
             /// [`Self::with_rng(rand::thread_rng())`](`Self::with_rng()`).
             #[allow(dead_code)]
             #[cfg(feature = "rand")]
-            pub fn new() -> Self {
+            pub fn rand() -> Self {
                 Self::with_rng(rand::thread_rng())
             }
 
-            /// Creates a random hex. This is the same as [`Default::default()`].
+            /// Creates a random hex.
             #[allow(dead_code)]
             #[cfg(feature = "rand")]
             pub fn with_rng(mut rng: impl rand::Rng) -> Self {

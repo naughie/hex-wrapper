@@ -7,7 +7,7 @@ impl_nonzero_hex! {
     /// use hex_wrapper::NonZeroHexUsize;
     ///
     /// // from random value
-    /// let rand = NonZeroHexUsize::new();
+    /// let rand = NonZeroHexUsize::rand();
     /// let inner = rand.get();
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
@@ -29,7 +29,7 @@ impl_nonzero_hex! {
     /// use hex_wrapper::NonZeroHex128;
     ///
     /// // from random value
-    /// let rand = NonZeroHex128::new();
+    /// let rand = NonZeroHex128::rand();
     /// let inner = rand.get();
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
@@ -51,7 +51,7 @@ impl_nonzero_hex! {
     /// use hex_wrapper::NonZeroHex64;
     ///
     /// // from random value
-    /// let rand = NonZeroHex64::new();
+    /// let rand = NonZeroHex64::rand();
     /// let inner = rand.get();
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
@@ -73,7 +73,7 @@ impl_nonzero_hex! {
     /// use hex_wrapper::NonZeroHex32;
     ///
     /// // from random value
-    /// let rand = NonZeroHex32::new();
+    /// let rand = NonZeroHex32::rand();
     /// let inner = rand.get();
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
@@ -95,7 +95,7 @@ impl_nonzero_hex! {
     /// use hex_wrapper::NonZeroHex16;
     ///
     /// // from random value
-    /// let rand = NonZeroHex16::new();
+    /// let rand = NonZeroHex16::rand();
     /// let inner = rand.get();
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
@@ -117,7 +117,7 @@ impl_nonzero_hex! {
     /// use hex_wrapper::NonZeroHex8;
     ///
     /// // from random value
-    /// let rand = NonZeroHex8::new();
+    /// let rand = NonZeroHex8::rand();
     /// let inner = rand.get();
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
