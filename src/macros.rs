@@ -119,6 +119,20 @@ macro_rules! impl_hex {
                 self.0
             }
 
+            /// Borrows the interior value.
+            #[allow(dead_code)]
+            #[inline]
+            pub fn get_ref(&self) -> &$alias {
+                &self.0
+            }
+
+            /// Gets the mutable reference to the interior value.
+            #[allow(dead_code)]
+            #[inline]
+            pub fn get_ref_mut(&mut self) -> &mut $alias {
+                &mut self.0
+            }
+
             #[allow(dead_code)]
             #[inline]
             pub fn from(n: $alias) -> Self {
@@ -172,6 +186,20 @@ macro_rules! impl_nonzero_hex {
             #[inline]
             pub fn get(self) -> $nonzero {
                 self.0
+            }
+
+            /// Borrows the interior value.
+            #[allow(dead_code)]
+            #[inline]
+            pub fn get_ref(&self) -> &$nonzero {
+                &self.0
+            }
+
+            /// Gets the mutable reference to the interior value.
+            #[allow(dead_code)]
+            #[inline]
+            pub fn get_ref_mut(&mut self) -> &mut $nonzero {
+                &mut self.0
             }
 
             #[allow(dead_code)]
