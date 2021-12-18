@@ -12,12 +12,12 @@ impl_hex! {
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
     /// // from given value
-    /// let given = HexUsize::from(0xa3);
+    /// let given = HexUsize::new(0xa3);
     /// assert_eq!(given.to_string(), String::from("a3"));
     ///
     /// // from string
     /// let from_str = "a3".parse::<HexUsize>();
-    /// assert_eq!(from_str.unwrap(), HexUsize::from(0xa3));
+    /// assert_eq!(from_str.unwrap(), HexUsize::new(0xa3));
     /// ```
     pub struct HexUsize(usize);
 }
@@ -34,12 +34,12 @@ impl_hex! {
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
     /// // from given value
-    /// let given = Hex128::from(0xa3);
+    /// let given = Hex128::new(0xa3);
     /// assert_eq!(given.to_string(), String::from("a3"));
     ///
     /// // from string
     /// let from_str = "a3".parse::<Hex128>();
-    /// assert_eq!(from_str.unwrap(), Hex128::from(0xa3));
+    /// assert_eq!(from_str.unwrap(), Hex128::new(0xa3));
     /// ```
     pub struct Hex128(u128);
 }
@@ -56,12 +56,12 @@ impl_hex! {
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
     /// // from given value
-    /// let given = Hex64::from(0xa3);
+    /// let given = Hex64::new(0xa3);
     /// assert_eq!(given.to_string(), String::from("a3"));
     ///
     /// // from string
     /// let from_str = "a3".parse::<Hex64>();
-    /// assert_eq!(from_str.unwrap(), Hex64::from(0xa3));
+    /// assert_eq!(from_str.unwrap(), Hex64::new(0xa3));
     /// ```
     pub struct Hex64(u64);
 }
@@ -78,12 +78,12 @@ impl_hex! {
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
     /// // from given value
-    /// let given = Hex32::from(0xa3);
+    /// let given = Hex32::new(0xa3);
     /// assert_eq!(given.to_string(), String::from("a3"));
     ///
     /// // from string
     /// let from_str = "a3".parse::<Hex32>();
-    /// assert_eq!(from_str.unwrap(), Hex32::from(0xa3));
+    /// assert_eq!(from_str.unwrap(), Hex32::new(0xa3));
     /// ```
     pub struct Hex32(u32);
 }
@@ -100,12 +100,12 @@ impl_hex! {
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
     /// // from given value
-    /// let given = Hex16::from(0xa3);
+    /// let given = Hex16::new(0xa3);
     /// assert_eq!(given.to_string(), String::from("a3"));
     ///
     /// // from string
     /// let from_str = "a3".parse::<Hex16>();
-    /// assert_eq!(from_str.unwrap(), Hex16::from(0xa3));
+    /// assert_eq!(from_str.unwrap(), Hex16::new(0xa3));
     /// ```
     pub struct Hex16(u16);
 }
@@ -122,12 +122,12 @@ impl_hex! {
     /// assert_eq!(rand.to_string(), format!("{:x}", inner));
     ///
     /// // from given value
-    /// let given = Hex8::from(0xa3);
+    /// let given = Hex8::new(0xa3);
     /// assert_eq!(given.to_string(), String::from("a3"));
     ///
     /// // from string
     /// let from_str = "a3".parse::<Hex8>();
-    /// assert_eq!(from_str.unwrap(), Hex8::from(0xa3));
+    /// assert_eq!(from_str.unwrap(), Hex8::new(0xa3));
     /// ```
     pub struct Hex8(u8);
 }

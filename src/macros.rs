@@ -1,14 +1,97 @@
 pub(crate) mod exports {
     pub use std::fmt;
-
-    #[cfg(feature = "serde")]
-    pub use serde::de::{self, Visitor};
-    #[cfg(feature = "serde")]
-    pub use serde::{Deserialize, Deserializer, Serialize, Serializer};
 }
 
-macro_rules! impl_traits {
+#[cfg(feature = "serde")]
+macro_rules! _impl_serde {
     ($hex: ident) => {
+        #[cfg(feature = "serde")]
+        impl serde::ser::Serialize for $hex {
+            #[inline]
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: serde::ser::Serializer,
+            {
+                serializer.serialize_str(&self.to_string())
+            }
+        }
+
+        #[cfg(feature = "serde")]
+        impl<'de> serde::de::Deserialize<'de> for $hex {
+            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+            where
+                D: serde::de::Deserializer<'de>,
+            {
+                use serde::de::{Error, Visitor};
+                struct HexVisitor;
+
+                impl<'de> Visitor<'de> for HexVisitor {
+                    type Value = $hex;
+
+                    #[inline]
+                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                        formatter.write_str("hex string, e.g. 00ab127e6")
+                    }
+
+                    #[inline]
+                    fn visit_str<E: Error>(self, value: &str) -> Result<Self::Value, E> {
+                        value.parse().map_err(E::custom)
+                    }
+                }
+
+                deserializer.deserialize_str(HexVisitor)
+            }
+        }
+    };
+}
+
+macro_rules! _impl_hex_common {
+    ($hex: ident, $inner: ty) => {
+        impl $hex {
+            /// Creates a random hex. This is equivalent to
+            /// [`Self::with_rng(rand::thread_rng())`](`Self::with_rng()`).
+            #[allow(dead_code)]
+            #[cfg(feature = "rand")]
+            pub fn rand() -> Self {
+                Self::with_rng(rand::thread_rng())
+            }
+
+            /// Creates a random hex.
+            #[allow(dead_code)]
+            #[cfg(feature = "rand")]
+            pub fn with_rng(mut rng: impl rand::Rng) -> Self {
+                Self(rng.gen())
+            }
+
+            /// Gets the interior value.
+            #[allow(dead_code)]
+            #[inline]
+            pub fn get(self) -> $inner {
+                self.0
+            }
+
+            /// Borrows the interior value.
+            #[allow(dead_code)]
+            #[inline]
+            pub fn get_ref(&self) -> &$inner {
+                &self.0
+            }
+
+            /// Gets the mutable reference to the interior value.
+            #[allow(dead_code)]
+            #[inline]
+            pub fn get_ref_mut(&mut self) -> &mut $inner {
+                &mut self.0
+            }
+        }
+
+        impl From<$inner> for $hex {
+            #[inline]
+            fn from(n: $inner) -> Self {
+                Self(n)
+            }
+        }
+
         impl std::str::FromStr for $hex {
             type Err = std::num::ParseIntError;
 
@@ -18,7 +101,7 @@ macro_rules! impl_traits {
             }
         }
 
-        impl std::convert::TryFrom<&str> for $hex {
+        impl TryFrom<&str> for $hex {
             type Error = std::num::ParseIntError;
 
             #[inline]
@@ -47,37 +130,6 @@ macro_rules! impl_traits {
                 value.to_string()
             }
         }
-
-        #[cfg(feature = "serde")]
-        impl Serialize for $hex {
-            #[inline]
-            fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-                serializer.serialize_str(&self.to_string())
-            }
-        }
-
-        #[cfg(feature = "serde")]
-        impl<'de> Deserialize<'de> for $hex {
-            fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-                struct HexVisitor;
-
-                impl<'de> Visitor<'de> for HexVisitor {
-                    type Value = $hex;
-
-                    #[inline]
-                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                        formatter.write_str("hex string, e.g. 00ab127e6")
-                    }
-
-                    #[inline]
-                    fn visit_str<E: de::Error>(self, value: &str) -> Result<Self::Value, E> {
-                        value.parse().map_err(E::custom)
-                    }
-                }
-
-                deserializer.deserialize_str(HexVisitor)
-            }
-        }
     };
 }
 
@@ -92,50 +144,7 @@ macro_rules! impl_hex {
             /// Creates a null hex (i.e., `0`).
             #[allow(dead_code)]
             #[inline]
-            pub fn new() -> Self {
-                Self(0)
-            }
-
-            /// Creates a random hex. This is equivalent to
-            /// [`Self::with_rng(rand::thread_rng())`](`Self::with_rng()`).
-            #[allow(dead_code)]
-            #[cfg(feature = "rand")]
-            pub fn rand() -> Self {
-                Self::with_rng(rand::thread_rng())
-            }
-
-            /// Creates a random hex.
-            #[allow(dead_code)]
-            #[cfg(feature = "rand")]
-            #[inline]
-            pub fn with_rng(mut rng: impl rand::Rng) -> Self {
-                Self::from(rng.gen())
-            }
-
-            /// Gets the interior value.
-            #[allow(dead_code)]
-            #[inline]
-            pub fn get(self) -> $alias {
-                self.0
-            }
-
-            /// Borrows the interior value.
-            #[allow(dead_code)]
-            #[inline]
-            pub fn get_ref(&self) -> &$alias {
-                &self.0
-            }
-
-            /// Gets the mutable reference to the interior value.
-            #[allow(dead_code)]
-            #[inline]
-            pub fn get_ref_mut(&mut self) -> &mut $alias {
-                &mut self.0
-            }
-
-            #[allow(dead_code)]
-            #[inline]
-            pub fn from(n: $alias) -> Self {
+            pub fn new(n: $alias) -> Self {
                 Self(n)
             }
 
@@ -154,7 +163,9 @@ macro_rules! impl_hex {
             }
         }
 
-        impl_traits! { $hex }
+        _impl_hex_common! { $hex, $alias }
+        #[cfg(feature = "serde")]
+        _impl_serde! { $hex }
     };
 }
 
@@ -166,51 +177,9 @@ macro_rules! impl_nonzero_hex {
         pub struct $hex($nonzero);
 
         impl $hex {
-            /// Creates a random hex. This is equivalent to
-            /// [`Self::with_rng(rand::thread_rng())`](`Self::with_rng()`).
-            #[allow(dead_code)]
-            #[cfg(feature = "rand")]
-            pub fn rand() -> Self {
-                Self::with_rng(rand::thread_rng())
-            }
-
-            /// Creates a random hex.
-            #[allow(dead_code)]
-            #[cfg(feature = "rand")]
-            pub fn with_rng(mut rng: impl rand::Rng) -> Self {
-                Self::from_nonzero(rng.gen())
-            }
-
-            /// Gets the interior value.
             #[allow(dead_code)]
             #[inline]
-            pub fn get(self) -> $nonzero {
-                self.0
-            }
-
-            /// Borrows the interior value.
-            #[allow(dead_code)]
-            #[inline]
-            pub fn get_ref(&self) -> &$nonzero {
-                &self.0
-            }
-
-            /// Gets the mutable reference to the interior value.
-            #[allow(dead_code)]
-            #[inline]
-            pub fn get_ref_mut(&mut self) -> &mut $nonzero {
-                &mut self.0
-            }
-
-            #[allow(dead_code)]
-            #[inline]
-            pub fn from_nonzero(n: $nonzero) -> Self {
-                Self(n)
-            }
-
-            #[allow(dead_code)]
-            #[inline]
-            pub fn from(n: $alias) -> Option<Self> {
+            pub fn new(n: $alias) -> Option<Self> {
                 <$nonzero>::new(n).map(Self)
             }
 
@@ -219,7 +188,7 @@ macro_rules! impl_nonzero_hex {
             /// The value must not be zero.
             #[allow(dead_code)]
             #[inline]
-            pub unsafe fn from_unchecked(n: $alias) -> Self {
+            pub unsafe fn new_unchecked(n: $alias) -> Self {
                 Self(<$nonzero>::new_unchecked(n))
             }
 
@@ -230,13 +199,23 @@ macro_rules! impl_nonzero_hex {
                         Err("0".parse::<$nonzero>().unwrap_err())
                     } else {
                         // SAFETY: n is nonzero
-                        unsafe { Ok(Self::from_unchecked(n)) }
+                        unsafe { Ok(Self::new_unchecked(n)) }
                     }
                 })
             }
         }
 
-        impl_traits! { $hex }
+        impl TryFrom<$alias> for $hex {
+            type Error = <$nonzero as TryFrom<$alias>>::Error;
+
+            fn try_from(value: $alias) -> Result<Self, Self::Error> {
+                <$nonzero>::try_from(value).map(Self)
+            }
+        }
+
+        _impl_hex_common! { $hex, $nonzero }
+        #[cfg(feature = "serde")]
+        _impl_serde! { $hex }
     };
 }
 
