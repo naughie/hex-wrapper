@@ -45,6 +45,60 @@ macro_rules! _impl_serde {
     };
 }
 
+#[cfg(feature = "db")]
+macro_rules! _impl_diesel {
+    ($hex: ident, $inner: ty) => {
+        impl<T, DB> diesel::serialize::ToSql<T, DB> for $hex
+        where
+            DB: diesel::backend::Backend,
+            $inner: diesel::serialize::ToSql<T, DB>,
+        {
+            #[inline]
+            fn to_sql<W: std::io::Write>(
+                &self,
+                out: &mut diesel::serialize::Output<W, DB>,
+            ) -> diesel::serialize::Result {
+                self.get_ref().to_sql(out)
+            }
+        }
+
+        impl<DB, ST> diesel::deserialize::Queryable<ST, DB> for $hex
+        where
+            DB: diesel::backend::Backend,
+            $inner: diesel::deserialize::Queryable<ST, DB>,
+        {
+            type Row = <$inner as diesel::deserialize::Queryable<ST, DB>>::Row;
+
+            #[inline]
+            fn build(row: Self::Row) -> Self {
+                Self(<$inner>::build(row))
+            }
+        }
+
+        impl<'a, T> diesel::expression::AsExpression<T> for &'a $hex
+        where
+            &'a $inner: diesel::expression::AsExpression<T>,
+        {
+            type Expression = <&'a $inner as diesel::expression::AsExpression<T>>::Expression;
+
+            fn as_expression(self) -> Self::Expression {
+                self.get_ref().as_expression()
+            }
+        }
+
+        impl<T> diesel::expression::AsExpression<T> for $hex
+        where
+            $inner: diesel::expression::AsExpression<T>,
+        {
+            type Expression = <$inner as diesel::expression::AsExpression<T>>::Expression;
+
+            fn as_expression(self) -> Self::Expression {
+                self.get().as_expression()
+            }
+        }
+    };
+}
+
 macro_rules! _impl_hex_common {
     ($hex: ident, $inner: ty) => {
         impl $hex {
@@ -166,6 +220,8 @@ macro_rules! impl_hex {
         _impl_hex_common! { $hex, $alias }
         #[cfg(feature = "serde")]
         _impl_serde! { $hex }
+        #[cfg(feature = "db")]
+        _impl_diesel! { $hex, $alias }
     };
 }
 
@@ -216,6 +272,8 @@ macro_rules! impl_nonzero_hex {
         _impl_hex_common! { $hex, $nonzero }
         #[cfg(feature = "serde")]
         _impl_serde! { $hex }
+        #[cfg(feature = "db")]
+        _impl_diesel! { $hex, $nonzero }
     };
 }
 
