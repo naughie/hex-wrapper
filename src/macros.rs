@@ -107,13 +107,13 @@ macro_rules! _impl_hex_common {
             #[allow(dead_code)]
             #[cfg(feature = "rand")]
             pub fn rand() -> Self {
-                Self::with_rng(rand::thread_rng())
+                Self::with_rng(&mut rand::thread_rng())
             }
 
             /// Creates a random hex.
             #[allow(dead_code)]
             #[cfg(feature = "rand")]
-            pub fn with_rng(mut rng: impl rand::Rng) -> Self {
+            pub fn with_rng(rng: &mut impl rand::Rng) -> Self {
                 Self(rng.gen())
             }
 
