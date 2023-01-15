@@ -9,6 +9,7 @@
 //!
 //! - `rand`: Enables random constructors `HexN::rand()` or `HexN::with_rng()`.
 //! - `serde`: Enables conversion used in [`serde`] (e.g. for json).
+//! - `db`: Enables implementations of [`diesel`] v1.4 traits.
 //!
 //!
 //! # Traits
