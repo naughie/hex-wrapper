@@ -15,7 +15,7 @@
 //!
 //! Each hex trait implements the following traits:
 //!
-//! - [`Default`] (only when the `rand` feature enabled) -- equivalent to `Self::new()`;
+//! - [`Default`] (only for `HexN`, not for `NonZeroHexN`);
 //! - [`FromStr`](std::str::FromStr`);
 //! - [`TryFrom<&str>`](`std::convert::TryFrom`);
 //! - [`Debug`](`std::fmt::Debug`);
