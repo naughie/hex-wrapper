@@ -120,14 +120,14 @@ macro_rules! _impl_hex_common {
             /// Gets the interior value.
             #[allow(dead_code)]
             #[inline]
-            pub fn get(self) -> $inner {
+            pub const fn get(self) -> $inner {
                 self.0
             }
 
             /// Borrows the interior value.
             #[allow(dead_code)]
             #[inline]
-            pub fn get_ref(&self) -> &$inner {
+            pub const fn get_ref(&self) -> &$inner {
                 &self.0
             }
 
@@ -136,6 +136,13 @@ macro_rules! _impl_hex_common {
             #[inline]
             pub fn get_ref_mut(&mut self) -> &mut $inner {
                 &mut self.0
+            }
+
+            /// The converse of [`Self::get()`]. This is same as the implementation of [`From`].
+            #[allow(dead_code)]
+            #[inline]
+            pub const fn from(n: $inner) -> Self {
+                Self(n)
             }
         }
 
