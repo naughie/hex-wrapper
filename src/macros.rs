@@ -54,11 +54,21 @@ macro_rules! _impl_diesel {
             $inner: diesel::serialize::ToSql<T, DB>,
         {
             #[inline]
-            fn to_sql<W: std::io::Write>(
-                &self,
-                out: &mut diesel::serialize::Output<W, DB>,
+            fn to_sql<'b>(
+                &'b self,
+                out: &mut diesel::serialize::Output<'b, '_, DB>,
             ) -> diesel::serialize::Result {
                 self.get_ref().to_sql(out)
+            }
+        }
+
+        impl<T, DB> diesel::deserialize::FromSql<T, DB> for $hex
+        where
+            DB: diesel::backend::Backend,
+            $inner: diesel::deserialize::FromSql<T, DB>,
+        {
+            fn from_sql(bytes: diesel::backend::RawValue<DB>) -> diesel::deserialize::Result<Self> {
+                <$inner>::from_sql(bytes).map(Self)
             }
         }
 
@@ -70,17 +80,19 @@ macro_rules! _impl_diesel {
             type Row = <$inner as diesel::deserialize::Queryable<ST, DB>>::Row;
 
             #[inline]
-            fn build(row: Self::Row) -> Self {
-                Self(<$inner>::build(row))
+            fn build(row: Self::Row) -> diesel::deserialize::Result<Self> {
+                <$inner>::build(row).map(Self)
             }
         }
 
         impl<'a, T> diesel::expression::AsExpression<T> for &'a $hex
         where
+            T: diesel::sql_types::SqlType + diesel::expression::TypedExpressionType,
             &'a $inner: diesel::expression::AsExpression<T>,
         {
             type Expression = <&'a $inner as diesel::expression::AsExpression<T>>::Expression;
 
+            #[inline]
             fn as_expression(self) -> Self::Expression {
                 self.get_ref().as_expression()
             }
@@ -88,10 +100,12 @@ macro_rules! _impl_diesel {
 
         impl<T> diesel::expression::AsExpression<T> for $hex
         where
+            T: diesel::sql_types::SqlType + diesel::expression::TypedExpressionType,
             $inner: diesel::expression::AsExpression<T>,
         {
             type Expression = <$inner as diesel::expression::AsExpression<T>>::Expression;
 
+            #[inline]
             fn as_expression(self) -> Self::Expression {
                 self.get().as_expression()
             }
