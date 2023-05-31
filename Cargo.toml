@@ -1,6 +1,6 @@
 [package]
 name = "hex-wrapper"
-version = "1.4.0"
+version = "1.4.1"
 edition = "2021"
 authors = ["Masato Nakata <masaton@naughie.com>"]
 description = "Wrappers of the convertion between numbers and hex strings"
@@ -26,4 +26,5 @@ rand = { version = "0.8", optional = true }
 [dependencies.diesel]
 version = "2.0"
 default-features = false
+features = ["with-deprecated"]
 optional = true
