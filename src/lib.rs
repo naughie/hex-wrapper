@@ -7,14 +7,14 @@
 //!
 //! Defaults are all off.
 //!
-//! - `rand`: Enables random constructors `HexN::rand()` or `HexN::with_rng()`.
+//! - `rand`: Enables random constructors `HexN::rand()` and `HexN::with_rng()`.
 //! - `serde`: Enables conversion used in [`serde`] (e.g. for json).
-//! - `db`: Enables implementations of [`diesel`] v1.4 traits.
+//! - `db`: Enables implementations of [`diesel`] v2.2 traits.
 //!
 //!
 //! # Traits
 //!
-//! Each hex trait implements the following traits:
+//! Each hex type implements the following traits:
 //!
 //! - [`Default`] (only for `HexN`, not for `NonZeroHexN`);
 //! - [`FromStr`](std::str::FromStr`);
@@ -24,6 +24,9 @@
 //! - [`Into<String>`](`Into`) and conversely [`String`] implements [`From<HexN>`](`From`);
 //! - [`Serialize`](`serde::Serialize`) and [`Deserialize`](`serde::Deserialize`) (only when the
 //!   `serde` feature enabled).
+//! - [`ToSql`](`diesel::serialize::ToSql`), [`FromSql`](`diesel::deserialize::FromSql`),
+//!   [`Queryable`](`diesel::deserialize::Queryable`) and [`AsExpression`](`diesel::expression::AsExpression`)
+//!   (only when the `db` feature enabled).
 
 #[macro_use]
 mod macros;
