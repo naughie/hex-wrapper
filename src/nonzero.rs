@@ -1,5 +1,3 @@
-use crate::macros::exports::*;
-
 impl_nonzero_hex! {
     /// Pointer-sized unsigned nonzero hexadecimal numbers.
     ///
@@ -19,7 +17,7 @@ impl_nonzero_hex! {
     /// let from_str = "a3".parse::<NonZeroHexUsize>();
     /// assert_eq!(from_str.unwrap(), NonZeroHexUsize::new(0xa3).unwrap());
     /// ```
-    pub struct NonZeroHexUsize(usize => std::num::NonZeroUsize);
+    pub struct NonZeroHexUsize(usize);
 }
 
 impl_nonzero_hex! {
@@ -41,7 +39,7 @@ impl_nonzero_hex! {
     /// let from_str = "a3".parse::<NonZeroHex128>();
     /// assert_eq!(from_str.unwrap(), NonZeroHex128::new(0xa3).unwrap());
     /// ```
-    pub struct NonZeroHex128(u128 => std::num::NonZeroU128);
+    pub struct NonZeroHex128(u128);
 }
 
 impl_nonzero_hex! {
@@ -63,7 +61,7 @@ impl_nonzero_hex! {
     /// let from_str = "a3".parse::<NonZeroHex64>();
     /// assert_eq!(from_str.unwrap(), NonZeroHex64::new(0xa3).unwrap());
     /// ```
-    pub struct NonZeroHex64(u64 => std::num::NonZeroU64);
+    pub struct NonZeroHex64(u64);
 }
 
 impl_nonzero_hex! {
@@ -85,7 +83,7 @@ impl_nonzero_hex! {
     /// let from_str = "a3".parse::<NonZeroHex32>();
     /// assert_eq!(from_str.unwrap(), NonZeroHex32::new(0xa3).unwrap());
     /// ```
-    pub struct NonZeroHex32(u32 => std::num::NonZeroU32);
+    pub struct NonZeroHex32(u32);
 }
 
 impl_nonzero_hex! {
@@ -107,7 +105,7 @@ impl_nonzero_hex! {
     /// let from_str = "a3".parse::<NonZeroHex16>();
     /// assert_eq!(from_str.unwrap(), NonZeroHex16::new(0xa3).unwrap());
     /// ```
-    pub struct NonZeroHex16(u16 => std::num::NonZeroU16);
+    pub struct NonZeroHex16(u16);
 }
 
 impl_nonzero_hex! {
@@ -129,5 +127,5 @@ impl_nonzero_hex! {
     /// let from_str = "a3".parse::<NonZeroHex8>();
     /// assert_eq!(from_str.unwrap(), NonZeroHex8::new(0xa3).unwrap());
     /// ```
-    pub struct NonZeroHex8(u8 => std::num::NonZeroU8);
+    pub struct NonZeroHex8(u8);
 }

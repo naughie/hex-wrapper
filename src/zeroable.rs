@@ -1,5 +1,3 @@
-use crate::macros::exports::*;
-
 impl_hex! {
     /// Pointer-sized unsigned hexadecimal numbers.
     ///

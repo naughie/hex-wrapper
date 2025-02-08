@@ -1,7 +1,3 @@
-pub(crate) mod exports {
-    pub use std::fmt;
-}
-
 #[cfg(feature = "serde")]
 macro_rules! _impl_serde {
     ($hex: ident) => {
@@ -29,7 +25,7 @@ macro_rules! _impl_serde {
                     type Value = $hex;
 
                     #[inline]
-                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
                         formatter.write_str("hex string, e.g. 00ab127e6")
                     }
 
@@ -67,8 +63,14 @@ macro_rules! _impl_diesel {
             DB: diesel::backend::Backend,
             $inner: diesel::deserialize::FromSql<T, DB>,
         {
-            fn from_sql(bytes: diesel::backend::RawValue<DB>) -> diesel::deserialize::Result<Self> {
+            fn from_sql(bytes: DB::RawValue<'_>) -> diesel::deserialize::Result<Self> {
                 <$inner>::from_sql(bytes).map(Self)
+            }
+
+            fn from_nullable_sql(
+                bytes: Option<DB::RawValue<'_>>,
+            ) -> diesel::deserialize::Result<Self> {
+                <$inner>::from_nullable_sql(bytes).map(Self)
             }
         }
 
@@ -118,42 +120,36 @@ macro_rules! _impl_hex_common {
         impl $hex {
             /// Creates a random hex. This is equivalent to
             /// [`Self::with_rng(rand::thread_rng())`](`Self::with_rng()`).
-            #[allow(dead_code)]
             #[cfg(feature = "rand")]
             pub fn rand() -> Self {
                 Self::with_rng(&mut rand::thread_rng())
             }
 
             /// Creates a random hex.
-            #[allow(dead_code)]
             #[cfg(feature = "rand")]
             pub fn with_rng(rng: &mut impl rand::Rng) -> Self {
                 Self(rng.gen())
             }
 
             /// Gets the interior value.
-            #[allow(dead_code)]
             #[inline]
             pub const fn get(self) -> $inner {
                 self.0
             }
 
             /// Borrows the interior value.
-            #[allow(dead_code)]
             #[inline]
             pub const fn get_ref(&self) -> &$inner {
                 &self.0
             }
 
             /// Gets the mutable reference to the interior value.
-            #[allow(dead_code)]
             #[inline]
-            pub fn get_ref_mut(&mut self) -> &mut $inner {
+            pub const fn get_ref_mut(&mut self) -> &mut $inner {
                 &mut self.0
             }
 
             /// The converse of [`Self::get()`]. This is same as the implementation of [`From`].
-            #[allow(dead_code)]
             #[inline]
             pub const fn from(n: $inner) -> Self {
                 Self(n)
@@ -185,17 +181,17 @@ macro_rules! _impl_hex_common {
             }
         }
 
-        impl fmt::Debug for $hex {
+        impl std::fmt::Debug for $hex {
             #[inline]
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                fmt::LowerHex::fmt(&self.0, f)
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                std::fmt::LowerHex::fmt(&self.0, f)
             }
         }
 
-        impl fmt::Display for $hex {
+        impl std::fmt::Display for $hex {
             #[inline]
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                fmt::LowerHex::fmt(&self.0, f)
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                std::fmt::LowerHex::fmt(&self.0, f)
             }
         }
 
@@ -216,14 +212,11 @@ macro_rules! impl_hex {
         pub struct $hex($alias);
 
         impl $hex {
-            /// Creates a null hex (i.e., `0`).
-            #[allow(dead_code)]
             #[inline]
             pub fn new(n: $alias) -> Self {
                 Self(n)
             }
 
-            #[allow(dead_code)]
             #[inline]
             fn parse_str(s: &str) -> Result<Self, std::num::ParseIntError> {
                 <$alias>::from_str_radix(s, 16).map(Self)
@@ -248,32 +241,29 @@ macro_rules! impl_hex {
 
 macro_rules! impl_nonzero_hex {
     ($(#[$meta: meta])*
-     pub struct $hex: ident ( $alias: ty => $nonzero: ty );) => {
+     pub struct $hex: ident ( $alias: ty );) => {
         $(#[$meta])*
         #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-        pub struct $hex($nonzero);
+        pub struct $hex(std::num::NonZero<$alias>);
 
         impl $hex {
-            #[allow(dead_code)]
             #[inline]
             pub fn new(n: $alias) -> Option<Self> {
-                <$nonzero>::new(n).map(Self)
+                <std::num::NonZero<$alias>>::new(n).map(Self)
             }
 
             /// # Safety
             ///
             /// The value must not be zero.
-            #[allow(dead_code)]
             #[inline]
             pub unsafe fn new_unchecked(n: $alias) -> Self {
-                Self(<$nonzero>::new_unchecked(n))
+                Self(<std::num::NonZero<$alias>>::new_unchecked(n))
             }
 
-            #[allow(dead_code)]
             fn parse_str(s: &str) -> Result<Self, std::num::ParseIntError> {
                 <$alias>::from_str_radix(s, 16).and_then(|n| {
                     if n == 0 {
-                        Err("0".parse::<$nonzero>().unwrap_err())
+                        Err("0".parse::<std::num::NonZero<$alias>>().unwrap_err())
                     } else {
                         // SAFETY: n is nonzero
                         unsafe { Ok(Self::new_unchecked(n)) }
@@ -283,32 +273,29 @@ macro_rules! impl_nonzero_hex {
         }
 
         impl TryFrom<$alias> for $hex {
-            type Error = <$nonzero as TryFrom<$alias>>::Error;
+            type Error = <std::num::NonZero<$alias> as TryFrom<$alias>>::Error;
 
             fn try_from(value: $alias) -> Result<Self, Self::Error> {
-                <$nonzero>::try_from(value).map(Self)
+                <std::num::NonZero<$alias>>::try_from(value).map(Self)
             }
         }
 
-        _impl_hex_common! { $hex, $nonzero }
+        _impl_hex_common! { $hex, std::num::NonZero<$alias> }
         #[cfg(feature = "serde")]
         _impl_serde! { $hex }
         #[cfg(feature = "db")]
-        _impl_diesel! { $hex, $nonzero }
+        _impl_diesel! { $hex, std::num::NonZero<$alias> }
     };
 }
 
 #[cfg(test)]
 mod test {
-    #[allow(unused_imports)]
-    use super::exports::*;
-
     impl_hex! {
         pub struct MyHex(u32);
     }
 
     impl_nonzero_hex! {
-        pub struct MyNonZero(u32 => std::num::NonZeroU32);
+        pub struct MyNonZero(u32);
     }
 
     #[test]
