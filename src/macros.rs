@@ -1,7 +1,6 @@
 #[cfg(feature = "serde")]
 macro_rules! _impl_serde {
     ($hex: ident) => {
-        #[cfg(feature = "serde")]
         impl serde::ser::Serialize for $hex {
             #[inline]
             fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -12,7 +11,6 @@ macro_rules! _impl_serde {
             }
         }
 
-        #[cfg(feature = "serde")]
         impl<'de> serde::de::Deserialize<'de> for $hex {
             fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
             where
@@ -112,6 +110,11 @@ macro_rules! _impl_diesel {
                 self.get().as_expression()
             }
         }
+
+        impl diesel::sql_types::SqlType for $hex {
+            type IsNull = diesel::sql_types::is_nullable::NotNull;
+        }
+        impl diesel::sql_types::SingleValue for $hex {}
     };
 }
 
