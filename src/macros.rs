@@ -198,6 +198,20 @@ macro_rules! _impl_hex_common {
             }
         }
 
+        impl std::fmt::LowerHex for $hex {
+            #[inline]
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                std::fmt::LowerHex::fmt(&self.0, f)
+            }
+        }
+
+        impl std::fmt::UpperHex for $hex {
+            #[inline]
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                std::fmt::UpperHex::fmt(&self.0, f)
+            }
+        }
+
         impl From<$hex> for String {
             #[inline]
             fn from(value: $hex) -> String {
